@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">DiplomaMobile</string>
+    <string name="title_home">Главная</string>
+    <string name="title_dashboard">Информация</string>
+    <string name="title_notifications">Настройки</string>
+
+
+    <string name="app_ver_string">v0.0.5</string>
+    <string name="testtextstr">Ошибка биометрической\nаутентификации</string>
+    <string name="devblockedtring">Выбор окружения dev заблокирован</string>
+    <string name="version_label">Версия: %s</string>
+    <string name="maininfolabel">Данное приложение разработано в рамках выпускной квалификацонной работы и представляет из себя мобильную часть программного комплекса для двухфакторной аутентификации</string>
+
+</resources>
