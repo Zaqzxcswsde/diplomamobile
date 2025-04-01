@@ -511,9 +511,9 @@ class MainActivity : AppCompatActivity() {
 
         val editTextTextPassword = findViewById<TextView>(R.id.editTextTextPassword)
         val pinTxtStr = editTextTextPassword.text.toString()
-//        editTextTextPassword.text = ""
-//        hideKeyboard(this)
-//        editTextTextPassword.clearFocus()
+        editTextTextPassword.text = ""
+        hideKeyboard(this)
+        editTextTextPassword.clearFocus()
 
         if (pinTxtStr.length < 10) {
 
