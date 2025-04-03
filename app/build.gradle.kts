@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.diplomamobile"
-        minSdk = 35
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -41,7 +41,11 @@ android {
 //        dataBinding = true
     }
 
-
+    packaging {
+        resources {
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+        }
+    }
 
 }
 
@@ -85,6 +89,7 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
+    implementation("androidx.biometric:biometric:1.4.0-alpha03")
 
 //    kapt("groupId:artifactId:version")
 

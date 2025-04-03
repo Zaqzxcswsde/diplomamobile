@@ -22,6 +22,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
 import androidx.cardview.widget.CardView
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.Fragment
@@ -49,6 +50,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.lang.Thread.sleep
+import java.security.KeyPair
 
 class NotificationsFragment : Fragment() {
 
@@ -93,7 +95,7 @@ class NotificationsFragment : Fragment() {
 
 
 
-    suspend fun editEnv(string: String) {
+    suspend fun editEnv(string: String = "prod") {
         val EXAMPLE_COUNTER = stringPreferencesKey("env")
         requireContext().dataStore.edit { settings ->
             settings[EXAMPLE_COUNTER] = string
@@ -151,7 +153,25 @@ class NotificationsFragment : Fragment() {
 
         var keyText = "❓"
         (activity as? MainActivity)?.let { mainActivity ->
-            val keyPair = mainActivity.getStoredKeyPair()
+
+
+            var keyPair : KeyPair? = null
+
+            val biometricManager = BiometricManager.from(requireView().context)
+            when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
+                BiometricManager.BIOMETRIC_SUCCESS -> {
+                    // Всё ок — можно генерировать ключ
+                    keyPair = mainActivity.getStoredKeyPair()
+                    // продолжай работу с ключом
+                }
+                BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
+                BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE,
+                BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                    // Покажи тост — биометрия не доступна или не настроена
+                    Toast.makeText(view.context, "Пожалуйста, настройте биометрию для использования функции", Toast.LENGTH_LONG).show()
+                }
+            }
+
             if (keyPair != null) {
                 keyText = mainActivity.exportPublicKeyToSingleLinePEM(keyPair.public)
             }

@@ -48,6 +48,7 @@ import java.security.MessageDigest
 
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.biometric.BiometricManager
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -132,7 +133,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        val token = sharedPref.getString("token", "") ?: ""
+//        val token = sharedPref.getString("token", "") ?: ""
 
 //        val txtTicket = findViewById<EditText>(R.id.txtTicket)
 //
@@ -372,22 +373,15 @@ class MainActivity : AppCompatActivity() {
 
     fun getUrl(context: Context) : String {
 
-        val EXAMPLE_COUNTER = stringPreferencesKey("env")
-        val exampleCounterFlow: Flow<String> = context.dataStore.data
-            .map { preferences ->
-                // No type safety.
-                preferences[EXAMPLE_COUNTER] ?: "prod"
-            }
-
         var url = "zaqzxcswsde.ru"
         var protocol = "https"
         var port = ""
 
-        if (getEnv(context) == "dev") {
-            url = "192.168.1.67"
-            protocol = "http"
-            port = "8000"
-        }
+//        if (getEnv(context) == "dev") {
+//            url = "192.168.1.67"
+//            protocol = "http"
+//            port = "8000"
+//        }
 
         return "$protocol://$url${if (port.length > 0) ":" else ""}$port"
     }
@@ -526,7 +520,27 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val keyPair = getStoredKeyPair() ?: generateRSAKeyPair()
+
+        var keyPair : KeyPair? = null
+
+        val biometricManager = BiometricManager.from(view!!.context)
+        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                // Всё ок — можно генерировать ключ
+                keyPair = getStoredKeyPair() ?: generateRSAKeyPair()
+                // продолжай работу с ключом
+            }
+            else -> {
+                // Покажи тост — биометрия не доступна или не настроена
+                Toast.makeText(view.context, "Пожалуйста, настройте биометрию для использования функции", Toast.LENGTH_LONG).show()
+                return
+            }
+        }
+
+
+
+
+
 
 //        val txt = findViewById<TextView>(R.id.text_home)
 
@@ -537,7 +551,7 @@ class MainActivity : AppCompatActivity() {
         isRequestInProgress = true
         authenticateAndSignJWT(
             this,
-            keyPair,
+            keyPair!!,
             ticketStr = token,
             pinDigest
         ) { jwt ->
